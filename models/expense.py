@@ -1,5 +1,5 @@
 import uuid
-from models import db
+from models import database as db
 from datetime import datetime, date
 from flask import jsonify as js
 
