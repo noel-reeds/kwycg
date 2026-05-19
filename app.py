@@ -4,7 +4,7 @@ from flask_login import LoginManager
 from models import db
 
 
-def _app():
+def setup():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.urandom(24)
     app.url_map.strict_slashes = False
@@ -31,6 +31,7 @@ def _app():
     return app
 
 
+app = setup()
+
 if __name__ == "__main__":
-    app = _app()
-    app.run(port=8000, debug=True)
+	app.run(port=8000, debug=True)
