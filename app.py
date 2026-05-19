@@ -4,7 +4,7 @@ from flask_login import LoginManager
 from models import db
 
 
-def fintrack_app():
+def _app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.urandom(24)
     app.url_map.strict_slashes = False
@@ -20,9 +20,9 @@ def fintrack_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    from api.v1.auth import auth as auth_blueprint
+    from api.v1.auth.auth import auth as auth_blueprint
     from api.v1.expenses import expense as expense_blueprint
-    from api.v1.users import user as users_blueprint
+    from api.v1.views.users import user as users_blueprint
 
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(expense_blueprint)
@@ -32,5 +32,5 @@ def fintrack_app():
 
 
 if __name__ == "__main__":
-    app = fintrack_app()
+    app = _app()
     app.run(port=8000, debug=True)
