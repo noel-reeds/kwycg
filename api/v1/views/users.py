@@ -1,7 +1,7 @@
 from flask import flash, Blueprint, render_template, request, redirect, url_for, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
-from models import User, db
+from models import User, database as db, session
 
 
 user = Blueprint('user', __name__)
@@ -28,3 +28,18 @@ def specific_user(user_id):
 
     except Exception as err:
         return jsonify({'message':'user does not exist'})
+
+@user.route('/api/v1/user/signup', methods=['POST'])
+def create_user():
+	try:
+		if request.is_json:
+			user_creds = request.json
+		new_user = User(email=user_creds.get(email),
+						password=user_creds.get(password),
+						username=user_creds.get(username),
+						name=user_creds.get(name)
+					)
+		session.add(new_user)
+		session.commit()
+	except Exception as e:
+		return jsonify({'message':'error with request!'})
