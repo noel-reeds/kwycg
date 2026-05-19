@@ -18,7 +18,7 @@ Next, we'll look into the various mobile wallets and maybe trace crypto.
 ## RUN  
 Create a virtual environment.  
 ```
-$ python -m venv .trace  
+$ python -m venv .venv  
 ```
 
 ```
@@ -28,7 +28,8 @@ $ pip3 install -r requirements.txt
 ## RUN  
 
 ```
-$ API_HOST=0.0.0.0 API_PORT=5000 python app.py  
+$ export FLASK_APP=app.py  
+$ flask run --debug  
 ```
 
 ## ROUTES  
