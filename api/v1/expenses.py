@@ -2,7 +2,7 @@ from flask import Flask, Blueprint, request, url_for, jsonify
 from flask import jsonify as js
 from models.expense import Expense
 from models.user import User
-from models import database as db
+from models import db_engine as db
 from datetime import datetime, date
 
 expense = Blueprint('expense', __name__)

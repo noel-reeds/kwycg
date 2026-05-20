@@ -1,4 +1,4 @@
-from . import database as db
+from . import db_engine as db
 
 class User(db.Model):
     """User model, defines a user and attrs"""

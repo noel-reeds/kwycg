@@ -1,8 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import Session
 
-database = SQLAlchemy()
-session = Session(database)
+db_engine = SQLAlchemy()
+session = db_engine.session
 
 from .user import User
 from .expense import Expense
