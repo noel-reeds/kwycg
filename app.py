@@ -1,24 +1,16 @@
-from flask import Flask
+from dotenv import load_dotenv
+from flask import Flask, g
 import os
-from flask_login import LoginManager
 
+load_dotenv()
 
 def setup():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = os.urandom(24)
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.url_map.strict_slashes = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///trace_pesa.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
     from models import db_engine
     db_engine.init_app(app)
-
-    login_manager = LoginManager()
-    login_manager.login_view ='auth.login'
-    login_manager.init_app(app)
-
-    from models.user import User
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
 
     from api.v1.auth.auth import auth as auth_blueprint
     from api.v1.expenses import expense as expense_blueprint
