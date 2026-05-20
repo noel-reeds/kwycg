@@ -14,7 +14,6 @@ def setup() -> Flask:
     registers views blueprints
 
     Params:
-    ------
     Function takes no parameters.
  
     Returns a flask app instance.
