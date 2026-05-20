@@ -34,8 +34,8 @@ async def create_user():
 	try:
 		if request.is_json:
 			user_creds = request.json
+			password = user_creds.get("password")
 		new_user = User(email=user_creds.get('email'),
-						password=user_creds.get('password'),
 						username=user_creds.get('username'),
 						name=user_creds.get('name')
 					)
@@ -43,10 +43,12 @@ async def create_user():
 		user = User.query.filter_by(email=email).first()
 		if user:
 			return jsonify({'message': 'user already exists'})
+		new_user.hash_passwd(password)
 		session.add(new_user)
 		session.commit()
 		return jsonify({'message': 'OK'})
 	except Exception as e:
+		print(e)
 		return jsonify({'message':'an error with the request'})
 
 @user.route('/delete_a_user/<int:user_id>', methods=['DELETE'])
