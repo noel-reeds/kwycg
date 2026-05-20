@@ -1,14 +1,30 @@
 from dotenv import load_dotenv
 from flask import Flask, g
+from flask_login import LoginManager
 import os
 
+login_manager = LoginManager()
 load_dotenv()
 
-def setup():
+def setup() -> Flask:
+    """
+    setup() -> Flask
+    Instantiate a Flask app, configures with the database engine,
+    sessions with flask_login and
+    registers views blueprints
+
+    Params:
+    ------
+    Function takes no parameters.
+ 
+    Returns a flask app instance.
+    """
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.url_map.strict_slashes = False
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+    login_manager.init_app(app)
+
     from models import db_engine
     db_engine.init_app(app)
 
