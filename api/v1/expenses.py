@@ -19,7 +19,7 @@ def uri_for(expense):
     return new
 
 
-@expense.route('/api/v1/expense/add/<int:user_id>', methods=['POST'])
+@expense.route('/add/<int:user_id>', methods=['POST'])
 def add_expense(user_id):
     """Adds an expenditure to the database"""
     response = request.json
@@ -39,7 +39,7 @@ def add_expense(user_id):
     return jsonify({'message': 'expense add success'})
 
 
-@expense.route('/api/v1/expense/remove/<uuid:expense_id>', methods=['DELETE'])
+@expense.route('/delete/<uuid:expense_id>', methods=['DELETE'])
 def delete_expense(expense_id):
     """Deletes an expense from database"""
     expense = Expense.query.filter_by(id=expense_id).first()
@@ -62,7 +62,7 @@ def user_expenses(user_id):
     return jsonify({'message': 'no expenses for this period'})
 
 
-@expense.route('/expense/update/<int:expense_id>', methods=['PUT'])
+@expense.route('/update/<int:expense_id>', methods=['PUT'])
 def update_expense(expense_id):
     """Updates a user expenditure"""
     expense = Expense.query.filter_by(id=expense_id, user_id=user_id).first()
@@ -78,7 +78,7 @@ def update_expense(expense_id):
         return jsonify({'message': 'Error occured updating expenditure'})
 
 
-@expense.route('/api/v1/expense/<expense_id>', methods=['GET'])
+@expense.route('/expense/<expense_id>', methods=['GET'])
 def ret_expense(expense_id):
     """Return a specific expenditure"""
     expense = Expense.query.filter_by(id=expense_id).first()
