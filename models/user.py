@@ -20,7 +20,8 @@ class User(db.Model):
     
     def to_dict(self):
         """converts user object into a serializable object"""
-        return dict(id=self.id,name=self.name,email=self.email,passwd_hash=self.passwd_hash)
+        return dict(id=self.id,name=self.name,email=self.email,
+                    passwd_hash=self.passwd_hash)
 
     def hash_passwd(self, password):
         self.passwd_hash =  cac.hash(password)
