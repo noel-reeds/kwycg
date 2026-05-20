@@ -7,9 +7,9 @@ def setup():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.urandom(24)
     app.url_map.strict_slashes = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fintrack_db.sqlite'
-    from models import database
-    database.init_app(app)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///trace_pesa.db'
+    from models import db_engine
+    db_engine.init_app(app)
 
     login_manager = LoginManager()
     login_manager.login_view ='auth.login'
@@ -21,12 +21,12 @@ def setup():
         return User.query.get(int(user_id))
 
     from api.v1.auth.auth import auth as auth_blueprint
-    from api.v1.views.expenses import expense as expense_blueprint
-    from api.v1.views.users import user as users_blueprint
+    from api.v1.expenses import expense as expense_blueprint
+    from api.v1.users import user as users_blueprint
 
-    app.register_blueprint(auth_blueprint)
-    app.register_blueprint(expense_blueprint)
-    app.register_blueprint(users_blueprint)
+    app.register_blueprint(auth_blueprint, url_prefix='/api/v1')
+    app.register_blueprint(expense_blueprint, url_prefix='/api/v1')
+    app.register_blueprint(users_blueprint, url_prefix='/api/v1')
 
     return app
 
