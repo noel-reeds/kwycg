@@ -1,6 +1,8 @@
 from . import db_engine as db
 from passlib.apps import custom_app_context as cac
-class User(db.Model):
+from flask_login import UserMixin
+
+class User(db.Model, UserMixin):
     """User model, defines a user and attrs"""
 
     __tablename__ = 'user'

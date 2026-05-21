@@ -22,7 +22,12 @@ def setup() -> Flask:
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.url_map.strict_slashes = False
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+    
+    from models import User
     login_manager.init_app(app)
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.get(user_id)
 
     from models import db_engine
     db_engine.init_app(app)
