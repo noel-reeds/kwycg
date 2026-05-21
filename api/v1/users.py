@@ -1,8 +1,7 @@
 from flask import flash, Blueprint, render_template, request, redirect, url_for, jsonify
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required
 from models import User, Expense, session, db_engine as db
 from passlib.apps import custom_app_context as cac
+from .auth import auth
 
 user = Blueprint('user', __name__)
 
@@ -64,6 +63,7 @@ async def delete_a_user(user_id):
         return {"message": "An error with the request!"}
 
 @user.route('/update', methods=['UPDATE'])
+@auth.login_required
 def user_update():
     try:
         if request.is_json:
@@ -79,5 +79,4 @@ def user_update():
             return {"message": "OK"}
         raise Exception
     except Exception as e:
-        print(e)
         return {"message": "FAILED"}
