@@ -9,10 +9,6 @@ For a start, we're making it possible to trace expenditures logged on Mpesa
 
 Next, we'll look into the various mobile wallets and maybe trace crypto.  
   
-![logo](https://i.imgur.com/I3m75vU.png)  
-
-
-
 ## SETUP  
 
 ## RUN  
