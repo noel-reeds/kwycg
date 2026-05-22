@@ -73,14 +73,6 @@ async def delete_a_user(user_id):
     except Exception as e:
         return {"message": "An error with the request!"}
 
-@auth.verify_password
-def verify_password(username, password):
-    user = User.query.filter_by(username=username).first()
-    if not user or not user.verify_passwd(password):
-        return False
-    g.user = user
-    return True
-
 @user.route('/update', methods=['UPDATE'])
 @auth.login_required
 def user_update():
