@@ -69,11 +69,16 @@ def user_update():
         if request.is_json:
             updated = request.json
         user = User.query.filter_by(id=updated.get('id')).first()
-        if user and "password" in updated.keys():
-            pwd_hash = cac.hash(updated.get("password"))
-            updated.pop("password")
-            updated.pop("id")
+        password = updated.get("password")
+        if user and password in updated.keys():
+            pwd_hash = cac.hash(password)
+            [updated.pop(key) for key in ["id", "password"]]
             updated.update(passwd_hash=pwd_hash)
+            db.session.query(User).update(updated)
+            session.commit()
+            return {"message": "OK"}
+        elif user and password is None:
+            updated.pop("id")
             db.session.query(User).update(updated)
             session.commit()
             return {"message": "OK"}

@@ -1,5 +1,5 @@
 from . import db_engine as db
-from passlib.apps import custom_app_context as cac
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 class User(db.Model, UserMixin):
@@ -26,7 +26,7 @@ class User(db.Model, UserMixin):
                     passwd_hash=self.passwd_hash)
 
     def hash_passwd(self, password):
-        self.passwd_hash =  cac.hash(password)
+        self.passwd_hash =  generate_password_hash(password)
 
     def verify_passwd(self, password):
-        return cac.verify(password, self.passwd_hash)
+        return check_password_hash(password, self.passwd_hash)
