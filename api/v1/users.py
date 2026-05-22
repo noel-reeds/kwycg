@@ -1,9 +1,20 @@
-from flask import flash, Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, jsonify, g, request
 from models import User, Expense, session, db_engine as db
-from passlib.apps import custom_app_context as cac
-from .auth import auth
+from werkzeug.security import generate_password_hash
+from flask_httpauth import HTTPBasicAuth
+
+auth = HTTPBasicAuth()
 
 user = Blueprint('user', __name__)
+
+@auth.verify_password
+def verify_password(username, password):
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.verify_passwd(password):
+        return False
+    g.user = user
+    return True
+
 
 @user.route('/users', methods=['GET'])
 def users():
@@ -62,26 +73,34 @@ async def delete_a_user(user_id):
     except Exception as e:
         return {"message": "An error with the request!"}
 
+@auth.verify_password
+def verify_password(username, password):
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.verify_passwd(password):
+        return False
+    g.user = user
+    return True
+
 @user.route('/update', methods=['UPDATE'])
 @auth.login_required
 def user_update():
     try:
-        if request.is_json:
-            updated = request.json
-        user = User.query.filter_by(id=updated.get('id')).first()
+        if not request.is_json:
+            raise Exception
+        updated = request.json
+        user_id = g.user.id
         password = updated.get("password")
-        if user and password in updated.keys():
-            pwd_hash = cac.hash(password)
-            [updated.pop(key) for key in ["id", "password"]]
+        if password is not None:
+            pwd_hash = generate_password_hash(password)
+            [updated.pop(k, None) for k in ['password', 'id']]
             updated.update(passwd_hash=pwd_hash)
-            db.session.query(User).update(updated)
+            db.session.query(User).filter(User.id == g.user.id).update(updated)
             session.commit()
             return {"message": "OK"}
-        elif user and password is None:
+        else:
             updated.pop("id")
-            db.session.query(User).update(updated)
+            db.session.query(User).filter(User.id == g.user.id).update(updated)
             session.commit()
             return {"message": "OK"}
-        raise Exception
     except Exception as e:
         return {"message": "FAILED"}
