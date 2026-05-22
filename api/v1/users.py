@@ -80,7 +80,6 @@ def user_update():
         if not request.is_json:
             raise Exception
         updated = request.json
-        user_id = g.user.id
         password = updated.get("password")
         if password is not None:
             pwd_hash = generate_password_hash(password)
