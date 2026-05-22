@@ -22,11 +22,14 @@ class User(db.Model, UserMixin):
     
     def to_dict(self):
         """converts user object into a serializable object"""
-        return dict(id=self.id,name=self.name,email=self.email,
-                    passwd_hash=self.passwd_hash)
+        return dict(username=self.username,
+                    passwd_hash=self.passwd_hash,
+                    email=self.email,
+                    id=self.id
+                )
 
     def hash_passwd(self, password):
         self.passwd_hash =  generate_password_hash(password)
 
     def verify_passwd(self, password):
-        return check_password_hash(password, self.passwd_hash)
+        return check_password_hash(self.passwd_hash, password)
