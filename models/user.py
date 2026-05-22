@@ -1,6 +1,7 @@
 from . import db_engine as db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from datetime import datetime as dt
 
 class User(db.Model, UserMixin):
     """User model, defines a user and attrs"""
@@ -12,7 +13,8 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(80))
     email = db.Column(db.String(120), unique=True, nullable=False)
     passwd_hash = db.Column(db.String(128), nullable=True)
-
+    created_at = db.Column(dt.datetime.isoformat(dt.now()))
+    
     # establish a relation between the user and expense table
     expenses = db.relationship('Expense', backref='user', lazy='dynamic')
 
@@ -25,7 +27,8 @@ class User(db.Model, UserMixin):
         return dict(username=self.username,
                     passwd_hash=self.passwd_hash,
                     email=self.email,
-                    id=self.id
+                    id=self.id,
+                    created_at=self.created_at
                 )
 
     def hash_passwd(self, password):
