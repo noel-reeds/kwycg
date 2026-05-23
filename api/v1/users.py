@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, g, request
-from models import User, Expense, session, db_engine as db
+from models import User, Expense, session
 from werkzeug.security import generate_password_hash
 from flask_httpauth import HTTPBasicAuth
 

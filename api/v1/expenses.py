@@ -1,43 +1,42 @@
 from flask import Flask, Blueprint, request, url_for, jsonify
 from flask import jsonify as js
-from models.expense import Expense
-from models.user import User
-from models import db_engine as db
+from models import Expense, User
+from models import session
 from datetime import datetime, date
+from api.v1.users import auth
 
 expense = Blueprint('expense', __name__)
 
-def uri_for(expense):
-    """Replaces expense id for a uri"""
-    new = {}
-    for key in expense.keys():
-        if key == 'user_id':
-            # replace id attr with uri
-            new['uri'] = url_for('expense.user_expenses', user_id=expense['user_id'], _external=True)
-        else:
-            new[key] = expense[key]
-    return new
-
-
 @expense.route('/add/<int:user_id>', methods=['POST'])
+@auth.login_required
 def add_expense(user_id):
-    """Adds an expenditure to the database"""
-    response = request.json
-    category = response.get('category')
-    desc = response.get('desc')
-    name = response.get('name')
-    amount = response.get('amount')
-    
-    # check if user exists before expense persists
-    user = User.query.filter_by(id=user_id).first()
-    if not user:
-        return jsonify({'message': 'user does not exist'})
-    new_expense = Expense(user_id=user_id,category=category,\
-                        desc=desc,name=name,amount=amount)
-    db.session.add(new_expense)
-    db.session.commit()
-    return jsonify({'message': 'expense add success'})
+    """
+    Adds an expenditure linked to a specific user 
+    to the database.
 
+    Params:
+    user_id foreign key from user table.
+    """
+    try:
+        if not response.is_json:
+            raise Exception
+        r = request.json
+        category = r.get('category')
+        description = r.get('description')
+        name = r.get('name')
+        amount_spent = r.get('amount')
+        # create a new expenditure.
+        new = Expense(user_id=user_id,
+                        category=category,
+                        description=description,
+                        name=name,
+                        amount_spent=amount
+                    )
+        session.add(new)
+        session.commit()
+        return {'message': 'OK'}
+    except Exception as e:
+        return {'message': 'error adding an expenditure'}
 
 @expense.route('/delete/<uuid:expense_id>', methods=['DELETE'])
 def delete_expense(expense_id):
@@ -50,7 +49,7 @@ def delete_expense(expense_id):
         return jsonify({'message': 'expense delete success'})
     return jsonify({'message': 'expense does not exist'})
 
-@expense.route('/api/v1/expenses/<int:user_id>', methods=['GET'])
+@expense.route('/expenses/<int:user_id>', methods=['GET'])
 def user_expenses(user_id):
     """Returns all expenses of a user"""
     if not User.query.filter_by(id=user_id).first():
