@@ -63,25 +63,24 @@ async def create_user():
     Params
     None.
     """
-	try:
-		if request.is_json:
-			user_creds = request.json
-			password = user_creds.get("password")
-		new_user = User(email=user_creds.get('email'),
-						username=user_creds.get('username'),
-						name=user_creds.get('name')
-					)
-		email=user_creds.get('email')
-		user = User.query.filter_by(email=email).first()
-		if user:
-			return jsonify({'message': 'user already exists'})
-		new_user.hash_passwd(password)
-		session.add(new_user)
-		session.commit()
-		return jsonify({'message': 'OK'})
-	except Exception as e:
-		print(e)
-		return jsonify({'message':'an error with the request'})
+    try:
+        if request.is_json:
+            user_creds = request.json
+            password = user_creds.get("password")
+        new_user = User(email=user_creds.get('email'),
+                        username=user_creds.get('username'),
+                        name=user_creds.get('name')
+                    )
+        email=user_creds.get('email')
+        user = User.query.filter_by(email=email).first()
+        if user:
+            return jsonify({'message': 'user already exists'})
+        new_user.hash_passwd(password)
+        session.add(new_user)
+        session.commit()
+        return jsonify({'message': 'OK'})
+    except Exception as e:
+        return jsonify({'message':'an error with the request'})
 
 @user.route('/delete_a_user/<int:user_id>', methods=['DELETE'])
 async def delete_a_user(user_id):
