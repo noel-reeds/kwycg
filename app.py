@@ -1,5 +1,5 @@
+from flask import Flask
 from dotenv import load_dotenv
-from flask import Flask, g
 from flask_login import LoginManager
 import os
 
@@ -24,9 +24,6 @@ def setup() -> Flask:
     app.url_map.strict_slashes = False
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
  
-    from models import db_engine
-    db_engine.init_app(app)
-
     from api.v1.auth.auth import auth as auth_blueprint
     from api.v1.expenses import expense as expense_blueprint
     from api.v1.users import user as users_blueprint
