@@ -1,4 +1,4 @@
-# TracePesa - Every cent matters!  
+# TraceCash - Every cent matters!  
   
 A simple budgeting tool to keep track users expenditure.  
 TracePesa aims to log users' expenditures from various payments platforms.  
