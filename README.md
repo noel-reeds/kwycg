@@ -1,17 +1,16 @@
-# TracePesa API.  
-## Every cent matters!
-A simple budgeting tool to fastrack users expenditure.  
+# TracePesa - Every cent matters!  
+  
+A simple budgeting tool to keep track users expenditure.  
 TracePesa aims to log users' expenditures from various payments platforms.  
   
 For a start, we're making it possible to trace expenditures logged on Mpesa  
-- Lipa na Mpesa options of:
-- Till Number & Paybill
+- Lipa na Mpesa options of:  
+- Till Number & Paybill  
 
 Next, we'll look into the various mobile wallets and maybe trace crypto.  
   
 ## SETUP  
 
-## RUN  
 Create a virtual environment.  
 ```
 $ python -m venv .venv  
