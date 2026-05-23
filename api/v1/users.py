@@ -9,6 +9,13 @@ user = Blueprint('user', __name__)
 
 @auth.verify_password
 def verify_password(username, password):
+    """
+    Verifies a user before accessing protected or private
+    endpoints.
+
+    Params
+    Username and password of user.
+    """
     user = User.query.filter_by(username=username).first()
     if not user or not user.verify_passwd(password):
         return False
@@ -18,7 +25,10 @@ def verify_password(username, password):
 
 @user.route('/users', methods=['GET'])
 def users():
-    """Retrieves all users in databases"""
+    """
+    Queries database and retrieve all users in databases if any,
+    error otherwise.
+    """
     try:
         users = User.query.all()
         if users:
@@ -30,17 +40,29 @@ def users():
 
 @user.route('/user/<int:user_id>', methods=['GET'])
 async def specific_user(user_id):
-    """Returns a specific user if present"""
+    """
+    Returns a user specified by user_id if present, error otherwise.
+
+    Params
+    Function takes in user id.
+    """
     # check for a user matching the supplied id
     try:
         user = User.query.filter_by(id=user_id).first()
         return user.to_dict()
 
     except Exception as e:
-        return jsonify({'message':'user does not exist'})
+        return {'message':'user does not exist'}
 
 @user.route('/signup', methods=['POST'])
 async def create_user():
+    """
+    Creates and persists a new user to the database.
+    If user already exists, return an error.
+
+    Params
+    None.
+    """
 	try:
 		if request.is_json:
 			user_creds = request.json
@@ -63,6 +85,13 @@ async def create_user():
 
 @user.route('/delete_a_user/<int:user_id>', methods=['DELETE'])
 async def delete_a_user(user_id):
+    """
+    Deletes a user if present in database, returns an error
+    otherwise.
+
+    Params
+    user_id tied to the user.
+    """
     try:
         user = User.query.filter_by(id=user_id).first()
         if user:
@@ -76,6 +105,12 @@ async def delete_a_user(user_id):
 @user.route('/update', methods=['UPDATE'])
 @auth.login_required
 def user_update():
+    """
+    Updates an exisiting user in the database.
+
+    Params
+    None.
+    """
     try:
         if not request.is_json:
             raise Exception
