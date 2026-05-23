@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, request, url_for, jsonify
+from flask import Flask, Blueprint, request, jsonify, g
 from flask import jsonify as js
 from models import Expense, User
 from models import session
@@ -18,19 +18,19 @@ def add_expense(user_id):
     user_id foreign key from user table.
     """
     try:
-        if not response.is_json:
+        if not request.is_json:
             raise Exception
         r = request.json
         category = r.get('category')
         description = r.get('description')
         name = r.get('name')
         amount_spent = r.get('amount')
-        # create a new expenditure.
-        new = Expense(user_id=user_id,
+
+        new = Expense(user_id=g.user.id,
                         category=category,
                         description=description,
                         name=name,
-                        amount_spent=amount
+                        amount=amount_spent
                     )
         session.add(new)
         session.commit()
