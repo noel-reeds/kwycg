@@ -1,7 +1,15 @@
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import declarative_base, sessionmaker, scoped_session
+from sqlalchemy import create_engine
+import os, app
 
-db_engine = SQLAlchemy()
-session = db_engine.session
+Base = declarative_base()
+
+engine = create_engine(os.getenv('SQLALCHEMY_DATABASE_URI'))
 
 from .user import User
 from .expense import Expense
+
+Base.metadata.create_all(engine)
+session_f = sessionmaker(bind=engine)
+session = scoped_session(session_f)
+Base.query = session.query_property()
