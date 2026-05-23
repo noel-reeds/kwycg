@@ -1,41 +1,49 @@
-import uuid
-from models import db_engine as db
+from sqlalchemy import DateTime, Integer, Column, String, ForeignKey
 from datetime import datetime, date
 from flask import jsonify as js
+from models import Base
+from sqlalchemy.sql import func
+import uuid
 
-
-class Expense(db.Model):
-    """Entails details of an expenditure"""
-
+class Expense(Base):
+    """
+    Defines expenditure class, initialization and a
+    to_dict function for serialization.
+    """
     __tablename__ = 'expenses'
 
-    id = db.Column(db.String, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    category = db.Column(db.String(100), nullable=False)
-    desc = db.Column(db.String(100), nullable=False)
-    name = db.Column(db.String(50), nullable=False)
-    amount = db.Column(db.Integer, nullable=False)
-    date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    id = Column(String, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user_accounts.id'), nullable=False)
+    category = Column(String(100), nullable=False)
+    description = Column(String(100), nullable=False)
+    name = Column(String(50), nullable=False)
+    amount = Column(Integer, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
 
     def __init__(self, *args, **kwargs):
-        """Initializes expenses' ids"""
+        """
+        Initializes expenses' ids
+        """
         self.id = str(uuid.uuid4())
-        self.date = date.today()
-        # check kwargs supplied for instance creation
         if kwargs:
-            for key, value in kwargs.items():
-                if value is None:
-                    return js({"message": "attr {} cannot be None".format(key)})
-        self.amount = kwargs.get('amount')
-        self.category = kwargs.get('category')
-        self.name = kwargs.get('name')
-        self.desc = kwargs.get('desc')
-        self.user_id = kwargs.get('user_id')
+            self.amount_spent = kwargs.get('amount')
+            self.category = kwargs.get('category')
+            self.name = kwargs.get('name')
+            self.description = kwargs.get('description')
+            self.user_id = kwargs.get('user_id')
     
     def to_dict(self):
-        """Returns a dictionary of the expense"""
-        return dict(id=self.id,category=self.category,\
-                    user_id=self.user_id,desc=self.desc,\
-                    name=self.name,amount=self.amount,\
-                    date=self.date.isoformat())
+        """
+        Returns a dictionary of the expense
+        """
+        return dict(id=self.id,
+                    category=self.category,
+                    user_id=self.user_id,
+                    description=self.description,
+                    name=self.name,
+                    amount_spent=self.amount_spent,
+                    created_at=self.created_at,
+                    updated_at=self.updated_at
+                )

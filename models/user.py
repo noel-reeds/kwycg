@@ -1,22 +1,31 @@
-from . import db_engine as db
+from sqlalchemy import DateTime, Integer, Column, String
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from datetime import datetime as dt
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+from models import Base
 
-class User(db.Model, UserMixin):
-    """User model, defines a user and attrs"""
+class User(Base, UserMixin):
+    """
+    Defines user class, str and methods for authentication
+    mechanisms
 
-    __tablename__ = 'user'
+    Params
+    Inherits from Base and UserMixin for configs
+    """
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
-    username = db.Column(db.String(80))
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    passwd_hash = db.Column(db.String(128), nullable=True)
-    created_at = db.Column(dt.datetime.isoformat(dt.now()))
+    __tablename__ = 'user_accounts'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(80), unique=True, nullable=False)
+    username = Column(String(80))
+    email = Column(String(120), unique=True, nullable=False)
+    passwd_hash = Column(String(128), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # establish a relation between the user and expense table
-    expenses = db.relationship('Expense', backref='user', lazy='dynamic')
+    expenses = relationship('Expense', backref='user_accounts', lazy='dynamic')
 
     def __repr__(self):
         """prints a user object"""
@@ -28,7 +37,8 @@ class User(db.Model, UserMixin):
                     passwd_hash=self.passwd_hash,
                     email=self.email,
                     id=self.id,
-                    created_at=self.created_at
+                    created_at=self.created_at,
+                    updated_at=self.updated_at
                 )
 
     def hash_passwd(self, password):
