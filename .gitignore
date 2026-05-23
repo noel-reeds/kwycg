@@ -1,6 +1,5 @@
+trace_pesa.db
 .env
-instance/
-.trace-cash/
 # ignore env variables
 .fintrack/
 *.venv
