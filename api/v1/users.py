@@ -85,13 +85,14 @@ def user_update():
             pwd_hash = generate_password_hash(password)
             [updated.pop(k, None) for k in ['password', 'id']]
             updated.update(passwd_hash=pwd_hash)
-            db.session.query(User).filter(User.id == g.user.id).update(updated)
+            session.query(User).filter(User.id == g.user.id).update(updated)
             session.commit()
             return {"message": "OK"}
         else:
             updated.pop("id")
-            db.session.query(User).filter(User.id == g.user.id).update(updated)
+            session.query(User).filter(User.id == g.user.id).update(updated)
             session.commit()
             return {"message": "OK"}
     except Exception as e:
+        print(e)
         return {"message": "FAILED"}
