@@ -1,8 +1,6 @@
-from flask import Flask, Blueprint, request, jsonify, g
-from flask import jsonify as js
-from models import Expense, User
-from models import session
-from datetime import datetime, date
+from flask import Blueprint, request, g
+from flask import jsonify as js, jsonify
+from models import Expense
 from api.v1.users import auth
 
 expense = Blueprint('expense', __name__)
@@ -32,6 +30,7 @@ def add_expense(user_id):
                         name=name,
                         amount=amount_spent
                     )
+        from models import session
         session.add(new)
         session.commit()
         return {'message': 'OK'}
@@ -40,25 +39,38 @@ def add_expense(user_id):
 
 @expense.route('/delete/<uuid:expense_id>', methods=['DELETE'])
 def delete_expense(expense_id):
-    """Deletes an expense from database"""
-    expense = Expense.query.filter_by(id=expense_id).first()
-    #check if expense exists
-    if expense:
-        db.session.delete(expense)
-        db.session.commit()
-        return jsonify({'message': 'expense delete success'})
-    return jsonify({'message': 'expense does not exist'})
+    """
+    Deletes an expenditure from the database if it exists,
+    otherwise return an error.
+
+    Params:
+    :expenditure_id
+    """
+    try:
+        expense = Expense.query.filter_by(id=expense_id).first()
+        if not expense:
+            return {'message': 'expense does not exist!'}
+        from models import session
+        session.delete(expense)
+        session.commit()
+        return {'message': 'OK'}
+    except Exception as e:
+        return {"message": "an error occured!"}
 
 @expense.route('/expenses/<int:user_id>', methods=['GET'])
+@auth.login_required
 def user_expenses(user_id):
-    """Returns all expenses of a user"""
-    if not User.query.filter_by(id=user_id).first():
-        return jsonify({'message': 'user does not exist'})
+    """
+    Queries the database and returns all expenses of a
+    user of any.
+
+    Params:
+    user_id of the user.
+    """
     expenses = Expense.query.filter_by(user_id=user_id).all()
     if expenses:
-        # uri method drops id attr and adds URI
-        return js({"expenses": [uri_for(expense.to_dict()) for expense in expenses]})
-    return jsonify({'message': 'no expenses for this period'})
+        return {"expenses": [uri_for(expense.to_dict()) for k in expenses]}
+    return jsonify({'message': 'no expenses for this user'})
 
 
 @expense.route('/update/<int:expense_id>', methods=['PUT'])
@@ -71,19 +83,21 @@ def update_expense(expense_id):
         expense.name = expense_info.get('name')
         expense.desc = expense_info.get('desc')
         expense.date = date.today()
-
-        db.session.commit()
+        from models import session
+        session.commit()
     except:
         return jsonify({'message': 'Error occured updating expenditure'})
 
 
 @expense.route('/expense/<expense_id>', methods=['GET'])
 def ret_expense(expense_id):
-    """Return a specific expenditure"""
+    """
+    Return a specific expenditure
+    """
     expense = Expense.query.filter_by(id=expense_id).first()
     if expense is None:
-        return jsonify({"message": "expenditure does not exists"})
+        return {"message": "expenditure does not exists"}
     try:
-        return jsonify({"expense": expense.to_dict()})
+        return {"expense": expense.to_dict()}
     except Exception as err:
-        return jsonify({"error": "{}".format(err)})
+        return {"error": "{}".format(err)}

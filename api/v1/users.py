@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, g, request
-from models import User, Expense, session
+from models import User
 from werkzeug.security import generate_password_hash
 from flask_httpauth import HTTPBasicAuth
 
@@ -76,6 +76,7 @@ async def create_user():
         if user:
             return jsonify({'message': 'user already exists'})
         new_user.hash_passwd(password)
+        from models import session
         session.add(new_user)
         session.commit()
         return jsonify({'message': 'OK'})
@@ -94,6 +95,7 @@ async def delete_a_user(user_id):
     try:
         user = User.query.filter_by(id=user_id).first()
         if user:
+            from models import session
             session.delete(user)
             session.commit()
             return {"status": "OK"}
@@ -115,6 +117,7 @@ def user_update():
             raise Exception
         updated = request.json
         password = updated.get("password")
+        from models import session
         if password is not None:
             pwd_hash = generate_password_hash(password)
             [updated.pop(k, None) for k in ['password', 'id']]
@@ -123,7 +126,6 @@ def user_update():
             session.commit()
             return {"message": "OK"}
         else:
-            updated.pop("id")
             session.query(User).filter(User.id == g.user.id).update(updated)
             session.commit()
             return {"message": "OK"}
