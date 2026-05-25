@@ -1,6 +1,4 @@
-from sqlalchemy import DateTime, Integer, Column, String, ForeignKey
-from datetime import datetime, date
-from flask import jsonify as js
+from sqlalchemy import DateTime, Integer, Column, String, ForeignKey, Numeric
 from models import Base
 from sqlalchemy.sql import func
 import uuid
@@ -17,26 +15,29 @@ class Expense(Base):
     category = Column(String(100), nullable=False)
     description = Column(String(100), nullable=False)
     name = Column(String(50), nullable=False)
-    amount = Column(Integer, nullable=False)
+    amount = Column(Numeric(precision=2), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
 
     def __init__(self, *args, **kwargs):
         """
-        Initializes expenses' ids
+        Instantiation of an expense object.
+
+        Params
+        *args, **kwargs to init the instance.
         """
-        self.id = str(uuid.uuid4())
         if kwargs:
-            self.amount_spent = kwargs.get('amount')
+            self.amount = kwargs.get('amount')
             self.category = kwargs.get('category')
             self.name = kwargs.get('name')
             self.description = kwargs.get('description')
             self.user_id = kwargs.get('user_id')
+        self.id = str(uuid.uuid4())
     
     def to_dict(self):
         """
-        Returns a dictionary of the expense
+        Returns a dictionary representation of the expense.
         """
         return dict(id=self.id,
                     category=self.category,
@@ -47,3 +48,9 @@ class Expense(Base):
                     created_at=self.created_at,
                     updated_at=self.updated_at
                 )
+    def __str__(self):
+        """
+        Return a custom str representation of the expenditure
+        object in place.
+        """
+        return 'You spent KES.{} on {}.'.format(self.amount, self.name)

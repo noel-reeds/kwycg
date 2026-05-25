@@ -28,11 +28,22 @@ class User(Base, UserMixin):
     expenses = relationship('Expense', backref='user_accounts', lazy='dynamic')
 
     def __repr__(self):
-        """prints a user object"""
+        """
+        Return a custom str representation of a user.
+
+        Params:
+        None.
+        """
         return '{} - {}'.format(self.name, self.email)
     
     def to_dict(self):
-        """converts user object into a serializable object"""
+        """"
+        Return a dictionary representation of user object for
+        serialization.
+
+        Params:
+        None.
+        """
         return dict(username=self.username,
                     passwd_hash=self.passwd_hash,
                     email=self.email,
