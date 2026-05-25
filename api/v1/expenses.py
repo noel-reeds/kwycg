@@ -68,10 +68,10 @@ def user_expenses(user_id):
     user_id of the user.
     """
     from models.expense import Expense
-    expenses = Expense.query.filter_by(user_id=user_id).all()
+    expenses = Expense.query.filter_by(user_id=g.user.id).all()
     if expenses:
         return {"expenses": [uri_for(expense.to_dict()) for k in expenses]}
-    return jsonify({'message': 'no expenses for this user'})
+    return {'message': 'no expenses for this user'}
 
 
 @expense.route('/update/<int:expense_id>', methods=['PUT'])
