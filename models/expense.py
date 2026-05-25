@@ -20,7 +20,7 @@ class Expense(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """
         Instantiation of an expense object.
 
@@ -35,7 +35,7 @@ class Expense(Base):
             self.user_id = kwargs.get('user_id')
         self.id = str(uuid.uuid4())
     
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Returns a dictionary representation of the expense.
         """
@@ -48,7 +48,7 @@ class Expense(Base):
                     created_at=self.created_at,
                     updated_at=self.updated_at
                 )
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Return a custom str representation of the expenditure
         object in place.
