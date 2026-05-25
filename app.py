@@ -24,7 +24,7 @@ def setup() -> Flask:
     app.url_map.strict_slashes = False
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
  
-    from api.v1.auth.auth import auth as auth_blueprint
+    from api.v1.auth import auth as auth_blueprint
     from api.v1.expenses import expense as expense_blueprint
     from api.v1.users import user as users_blueprint
 
@@ -34,8 +34,7 @@ def setup() -> Flask:
 
     return app
 
-
 app = setup()
 
 if __name__ == "__main__":
-	app.run(port=8000, debug=True)
+    app.run(port=8000, debug=True)
