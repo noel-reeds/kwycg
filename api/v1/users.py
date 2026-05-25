@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, g, request
-from models import User
 from werkzeug.security import generate_password_hash
 from flask_httpauth import HTTPBasicAuth
 
@@ -16,6 +15,7 @@ def verify_password(username, password):
     Params
     Username and password of user.
     """
+    from models import User
     user = User.query.filter_by(username=username).first()
     if not user or not user.verify_passwd(password):
         return False
@@ -29,14 +29,15 @@ def users():
     Queries database and retrieve all users in databases if any,
     error otherwise.
     """
+    from models import User
     try:
         users = User.query.all()
         if users:
-            return [user.to_dict() for user in users]
+            return {"users": [user.to_dict() for user in users]}
         else:
-            return jsonify({'message':'no users'})
+            return {'message':'no users'}
     except Exception as err:
-        return jsonify({'message':'{}'.format(err)})
+        return {'message':'{}'.format(err)}
 
 @user.route('/user/<int:user_id>', methods=['GET'])
 async def specific_user(user_id):
@@ -46,6 +47,7 @@ async def specific_user(user_id):
     Params
     Function takes in user id.
     """
+    from models import User
     # check for a user matching the supplied id
     try:
         user = User.query.filter_by(id=user_id).first()
@@ -63,6 +65,7 @@ async def create_user():
     Params
     None.
     """
+    from models import User
     try:
         if request.is_json:
             user_creds = request.json
@@ -92,6 +95,7 @@ async def delete_a_user(user_id):
     Params
     user_id tied to the user.
     """
+    from models import User
     try:
         user = User.query.filter_by(id=user_id).first()
         if user:
@@ -112,6 +116,7 @@ def user_update():
     Params
     None.
     """
+    from models import User
     try:
         if not request.is_json:
             raise Exception

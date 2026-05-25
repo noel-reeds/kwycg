@@ -44,7 +44,7 @@ class Expense(Base):
                     user_id=self.user_id,
                     description=self.description,
                     name=self.name,
-                    amount_spent=self.amount_spent,
+                    amount_spent=self.amount,
                     created_at=self.created_at,
                     updated_at=self.updated_at
                 )
