@@ -1,6 +1,5 @@
 from flask import Blueprint, request, g
 from flask import jsonify as js, jsonify
-from models import Expense
 from api.v1.users import auth
 
 expense = Blueprint('expense', __name__)
@@ -23,14 +22,14 @@ def add_expense(user_id):
         description = r.get('description')
         name = r.get('name')
         amount_spent = r.get('amount')
-
+        from models.expense import Expense
+        from models import session
         new = Expense(user_id=g.user.id,
                         category=category,
                         description=description,
                         name=name,
                         amount=amount_spent
                     )
-        from models import session
         session.add(new)
         session.commit()
         return {'message': 'OK'}
@@ -47,10 +46,11 @@ def delete_expense(expense_id):
     :expenditure_id
     """
     try:
+        from models import Expense
+        from models import session
         expense = Expense.query.filter_by(id=expense_id).first()
         if not expense:
             return {'message': 'expense does not exist!'}
-        from models import session
         session.delete(expense)
         session.commit()
         return {'message': 'OK'}
@@ -67,6 +67,7 @@ def user_expenses(user_id):
     Params:
     user_id of the user.
     """
+    from models.expense import Expense
     expenses = Expense.query.filter_by(user_id=user_id).all()
     if expenses:
         return {"expenses": [uri_for(expense.to_dict()) for k in expenses]}
@@ -76,6 +77,7 @@ def user_expenses(user_id):
 @expense.route('/update/<int:expense_id>', methods=['PUT'])
 def update_expense(expense_id):
     """Updates a user expenditure"""
+    from models.expense import Expense
     expense = Expense.query.filter_by(id=expense_id, user_id=user_id).first()
     try:
         expense_info = request.get_json()
@@ -94,6 +96,7 @@ def ret_expense(expense_id):
     """
     Return a specific expenditure
     """
+    from models.expense import Expense
     expense = Expense.query.filter_by(id=expense_id).first()
     if expense is None:
         return {"message": "expenditure does not exists"}
