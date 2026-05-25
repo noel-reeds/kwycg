@@ -57,9 +57,9 @@ def delete_expense(expense_id):
     except Exception as e:
         return {"message": "an error occured!"}
 
-@expense.route('/expenses/<int:user_id>', methods=['GET'])
+@expense.route('/expenses', methods=['GET'])
 @auth.login_required
-def user_expenses(user_id):
+def user_expenses():
     """
     Queries the database and returns all expenses of a
     user of any.
@@ -70,7 +70,7 @@ def user_expenses(user_id):
     from models.expense import Expense
     expenses = Expense.query.filter_by(user_id=g.user.id).all()
     if expenses:
-        return {"expenses": [uri_for(expense.to_dict()) for k in expenses]}
+        return {"expenses": [k.to_dict() for k in expenses]}
     return {'message': 'no expenses for this user'}
 
 
