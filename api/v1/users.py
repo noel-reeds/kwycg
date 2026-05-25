@@ -29,9 +29,9 @@ def users():
     Queries database and retrieve all users in databases if any,
     error otherwise.
     """
-    from models import User
+    from models import User, session
     try:
-        users = User.query.all()
+        users = session.query(User).all()
         if users:
             return {"users": [user.to_dict() for user in users]}
         else:
@@ -135,5 +135,4 @@ def user_update():
             session.commit()
             return {"message": "OK"}
     except Exception as e:
-        print(e)
         return {"message": "FAILED"}

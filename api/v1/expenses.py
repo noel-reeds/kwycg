@@ -22,8 +22,7 @@ def add_expense(user_id):
         description = r.get('description')
         name = r.get('name')
         amount_spent = r.get('amount')
-        from models.expense import Expense
-        from models import session
+        from models import Expense, session
         new = Expense(user_id=g.user.id,
                         category=category,
                         description=description,
@@ -46,9 +45,10 @@ def delete_expense(expense_id):
     :expenditure_id
     """
     try:
-        from models import Expense
-        from models import session
-        expense = Expense.query.filter_by(id=expense_id).first()
+        from models import Expense, session
+        expense = session.query(Expense).filter_by(id=expense_id).first()
+        print(expense)
+        raise Exception
         if not expense:
             return {'message': 'expense does not exist!'}
         session.delete(expense)
@@ -67,40 +67,46 @@ def user_expenses():
     Params:
     user_id of the user.
     """
-    from models.expense import Expense
-    expenses = Expense.query.filter_by(user_id=g.user.id).all()
+    from models import Expense, session
+    expenses = session.query(Expense).filter_by(user_id=g.user.id).all()
     if expenses:
         return {"expenses": [k.to_dict() for k in expenses]}
     return {'message': 'no expenses for this user'}
 
 
-@expense.route('/update/<int:expense_id>', methods=['PUT'])
+@expense.route('/update/<uuid:expense_id>', methods=['UPDATE'])
+@auth.login_required
 def update_expense(expense_id):
-    """Updates a user expenditure"""
-    from models.expense import Expense
-    expense = Expense.query.filter_by(id=expense_id, user_id=user_id).first()
+    """
+    Updates a user expenditure if it exists, otherwise
+    return an error.
+
+    Params:
+    :expense_id
+    """
+    from models import Expense, session
     try:
-        expense_info = request.get_json()
-        expense.amount = expense_info.get('amount')
-        expense.name = expense_info.get('name')
-        expense.desc = expense_info.get('desc')
-        expense.date = date.today()
-        from models import session
+        if not request.is_json:
+            raise Exception
+        update_info = request.get_json()
+        session.query(Expense).filter_by(id=expense_id).update(update_info)
         session.commit()
-    except:
-        return jsonify({'message': 'Error occured updating expenditure'})
+        return {"message": "OK"}
+    except Exception as e:
+        print(e)
+        return {'message': 'An error occured!'}
 
 
-@expense.route('/expense/<expense_id>', methods=['GET'])
-def ret_expense(expense_id):
+@expense.route('/expense/<uuid:expense_id>', methods=['GET'])
+def expenditure(expense_id):
     """
     Return a specific expenditure
     """
-    from models.expense import Expense
-    expense = Expense.query.filter_by(id=expense_id).first()
+    from models import Expense, session
+    e = session.query(Expense).filter_by(id=expense_id).first()
     if expense is None:
         return {"message": "expenditure does not exists"}
     try:
-        return {"expense": expense.to_dict()}
+        return {"expense": e.to_dict()}
     except Exception as err:
         return {"error": "{}".format(err)}
