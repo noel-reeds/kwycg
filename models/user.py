@@ -27,7 +27,7 @@ class User(Base, UserMixin):
     # establish a relation between the user and expense table
     expenses = relationship('Expense', backref='user_accounts', lazy='dynamic')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Return a custom str representation of a user.
 
@@ -36,7 +36,7 @@ class User(Base, UserMixin):
         """
         return '{} - {}'.format(self.name, self.email)
     
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """"
         Return a dictionary representation of user object for
         serialization.
@@ -52,8 +52,8 @@ class User(Base, UserMixin):
                     updated_at=self.updated_at
                 )
 
-    def hash_passwd(self, password):
+    def hash_passwd(self, password: str) -> None:
         self.passwd_hash =  generate_password_hash(password)
 
-    def verify_passwd(self, password):
+    def verify_passwd(self, password: str) -> bool:
         return check_password_hash(self.passwd_hash, password)
