@@ -72,6 +72,9 @@ class test_user_models(unittest.TestCase):
         # invoking an instance method with cls, raises an error.
         with self.assertRaises(TypeError):
             User.verify_passwd(self.passwd)
+        # invoke fn with more than one positional argument, raises an error
+        with self.assertRaises(TypeError):
+            mock_verify_passwd(self.passwd, self.passwd)
         self.assertIsInstance(self.passwd, str)
         self.assertIsInstance(mock_verify_passwd(self.passwd), bool)
         self.assertTrue(mock_verify_passwd(self.passwd))
