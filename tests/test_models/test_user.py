@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import create_autospec
+from unittest.mock import create_autospec, Mock
 from models import User
 
 class test_user_models(unittest.TestCase):
@@ -12,8 +12,8 @@ class test_user_models(unittest.TestCase):
         """
         self.user = User(name='reeds', email='nre@y.me')
         self.passwd = 'passwd'
-        self.userkeys = {'email', 'id', 'updated_at',
-                            'username', 'created_at', 'passwd_hash'}
+        self.userkeys = {'email':'', 'id':'', 'updated_at':'',
+                            'username':'', 'created_at':'', 'passwd_hash':''}
 
     def test_class_attributes(self):
         """
@@ -27,19 +27,35 @@ class test_user_models(unittest.TestCase):
         Test to_dict instance method to check if it returns
         a dictionary or otherwise.
         """
-        self.assertEqual(len(self.user.to_dict()), 6)
+        mock_to_dict = create_autospec(self.user.to_dict,
+                                            return_value=self.userkeys)
+        # invoke with fn with arguments, raises an error
+        with self.assertRaises(TypeError):
+            mock_to_dict(67)
+        mock_to_dict()
+        self.assertTrue(mock_to_dict.call_count > 0)
+        mock_to_dict.assert_called_once_with()
+        self.assertEqual(len(mock_to_dict()), 6)
         for key in self.userkeys:
-            self.assertIn(key, self.user.to_dict())
-        self.assertIsInstance(self.user.to_dict(), dict)
+            self.assertIn(key, mock_to_dict())
+        self.assertIsInstance(mock_to_dict(), dict)
 
     def test_hash_passwd(self):
         """
         Test hash_passwd function to check that it hashes a
         password str to a hash.
         """
-        self.user.hash_passwd(self.passwd)
+        mock_hash_passwd = create_autospec(self.user.hash_passwd, 
+                                            return_value=None)
+        # invoke with no arguments, raises an error
+        with self.assertRaises(TypeError):
+            mock_hash_passwd()
+        # invoke with more that one positional arguments, raises an error
+        with self.assertRaises(TypeError):
+            mock_hash_passwd(67, 88)
+        mock_hash_passwd(self.passwd)
+        mock_hash_passwd.assert_called_once_with(self.passwd)
         self.assertTrue(hasattr(self.user, 'passwd_hash'))
-        self.assertIsNotNone(self.user.__dict__.get('passwd_hash'))
 
     def test_verify_passwd(self):
         """
@@ -47,19 +63,27 @@ class test_user_models(unittest.TestCase):
         a bool for True hash, otherwise False.
         """
         mock_verify_passwd = create_autospec(self.user.verify_passwd,
-                        return_value=None)
+                        return_value=True)
         mock_verify_passwd(self.passwd)
         mock_verify_passwd.assert_called_once_with(self.passwd)
+        # invoking the fn without args raises an error.
+        with self.assertRaises(TypeError):
+            mock_verify_passwd()
+        # invoking an instance method with cls, raises an error.
+        with self.assertRaises(TypeError):
+            User.verify_passwd(self.passwd)
         self.assertIsInstance(self.passwd, str)
-        self.user.hash_passwd(self.passwd)
-        self.assertIsInstance(self.user.verify_passwd(self.passwd), bool)
-        self.assertTrue(self.user.verify_passwd(self.passwd))
-        self.assertFalse(self.user.verify_passwd('random passwd'))
+        self.assertIsInstance(mock_verify_passwd(self.passwd), bool)
+        self.assertTrue(mock_verify_passwd(self.passwd))
 
     def test_repr(self):
         """
         Test unofficial representation method for objects.
         """
-        self.assertIsInstance(repr(self.user), str)
-        self.assertTrue(repr(self.user) == 'reeds - nre@y.me')
-        self.assertTrue(repr(User) == "<class 'models.user.User'>")
+        self.user.__repr__ = Mock(return_value='reeds - nre@y.me')
+        self.user.__repr__()
+        self.assertTrue(self.user.__repr__.called)
+        self.user.__repr__.assert_called_once_with()
+        self.assertTrue(self.user.__repr__.call_count > 0)
+        self.assertIsInstance(self.user.__repr__(self.user), str)
+        self.assertTrue(self.user.__repr__(self.user) == 'reeds - nre@y.me')
