@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import create_autospec
 from models import User
 
 class test_user_models(unittest.TestCase):
@@ -45,6 +46,10 @@ class test_user_models(unittest.TestCase):
         Test verify_passwd method that it indeed returns
         a bool for True hash, otherwise False.
         """
+        mock_verify_passwd = create_autospec(self.user.verify_passwd,
+                        return_value=None)
+        mock_verify_passwd(self.passwd)
+        mock_verify_passwd.assert_called_once_with(self.passwd)
         self.assertIsInstance(self.passwd, str)
         self.user.hash_passwd(self.passwd)
         self.assertIsInstance(self.user.verify_passwd(self.passwd), bool)
