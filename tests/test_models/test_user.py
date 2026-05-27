@@ -83,7 +83,8 @@ class test_user_models(unittest.TestCase):
         """
         Test unofficial representation method for objects.
         """
-        self.user.__repr__ = Mock(return_value='reeds - nre@y.me')
+        self.user.__repr__ = Mock(return_value='reeds - nre@y.me',
+                                        unsafe=True)
         self.user.__repr__()
         self.assertTrue(self.user.__repr__.called)
         self.user.__repr__.assert_called_once_with()
