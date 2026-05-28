@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from models import Base
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 class User(Base, UserMixin):
     """
@@ -26,6 +27,36 @@ class User(Base, UserMixin):
     
     # establish a relation between the user and expense table
     expenses = relationship('Expense', backref='user_accounts', lazy='dynamic')
+
+    def generate_auth_token(self) -> str:
+        """
+        Generate an authentication token.
+
+        Params:
+        :duration of token expiration.
+        """
+        from app import app
+        auth_s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        return auth_s.dumps({ 'id': self.id })
+
+    @staticmethod
+    def verify_auth_token(token, expires_in=600):
+        """
+        Verifies authentication token.
+
+        Params:
+        :auth. token.
+        """
+        from models import app
+        auth_s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        try:
+            d = auth_s.loads(token, max_age=expires_in)
+        except SignatureExpired:
+            return None
+        except BadSignature:
+            return None
+        user = User.query.get(data.get('id'))
+        return user
 
     def __repr__(self) -> str:
         """
