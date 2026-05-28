@@ -14,6 +14,7 @@ def add_expense(user_id):
     Params:
     user_id foreign key from user table.
     """
+    from models import Expense, session
     try:
         if not request.is_json:
             raise Exception
@@ -22,7 +23,6 @@ def add_expense(user_id):
         description = r.get('description')
         name = r.get('name')
         amount_spent = r.get('amount')
-        from models import Expense, session
         new = Expense(user_id=g.user.id,
                         category=category,
                         description=description,
@@ -35,7 +35,7 @@ def add_expense(user_id):
     except Exception as e:
         return {'message': 'error adding an expenditure'}
 
-@expense.route('/delete/<uuid:expense_id>', methods=['DELETE'])
+@expense.route('/delete/<string:expense_id>', methods=['DELETE'])
 def delete_expense(expense_id):
     """
     Deletes an expenditure from the database if it exists,
@@ -47,8 +47,6 @@ def delete_expense(expense_id):
     try:
         from models import Expense, session
         expense = session.query(Expense).filter_by(id=expense_id).first()
-        print(expense)
-        raise Exception
         if not expense:
             return {'message': 'expense does not exist!'}
         session.delete(expense)
@@ -74,7 +72,7 @@ def user_expenses():
     return {'message': 'no expenses for this user'}
 
 
-@expense.route('/update/<uuid:expense_id>', methods=['UPDATE'])
+@expense.route('/update/<string:expense_id>', methods=['UPDATE'])
 @auth.login_required
 def update_expense(expense_id):
     """
@@ -93,20 +91,20 @@ def update_expense(expense_id):
         session.commit()
         return {"message": "OK"}
     except Exception as e:
-        print(e)
         return {'message': 'An error occured!'}
 
-
-@expense.route('/expense/<uuid:expense_id>', methods=['GET'])
+@expense.route('/expense/<string:expense_id>', methods=['GET'])
+@auth.login_required
 def expenditure(expense_id):
     """
     Return a specific expenditure
     """
     from models import Expense, session
-    e = session.query(Expense).filter_by(id=expense_id).first()
-    if expense is None:
-        return {"message": "expenditure does not exists"}
     try:
+        e = session.query(Expense).filter_by(id=expense_id).first()
+        print(e)
+        if e is None:
+            return {'error': 'expense does not exist!'}
         return {"expense": e.to_dict()}
     except Exception as err:
         return {"error": "{}".format(err)}

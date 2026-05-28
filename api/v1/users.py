@@ -52,7 +52,6 @@ async def specific_user(user_id):
     try:
         user = User.query.filter_by(id=user_id).first()
         return user.to_dict()
-
     except Exception as e:
         return {'message':'user does not exist'}
 
@@ -65,7 +64,7 @@ async def create_user():
     Params
     None.
     """
-    from models import User
+    from models import User, session
     try:
         if request.is_json:
             user_creds = request.json
@@ -79,11 +78,11 @@ async def create_user():
         if user:
             return jsonify({'message': 'user already exists'})
         new_user.hash_passwd(password)
-        from models import session
         session.add(new_user)
         session.commit()
         return jsonify({'message': 'OK'})
     except Exception as e:
+        print(e)
         return jsonify({'message':'an error with the request'})
 
 @user.route('/delete_a_user/<int:user_id>', methods=['DELETE'])
@@ -95,11 +94,10 @@ async def delete_a_user(user_id):
     Params
     user_id tied to the user.
     """
-    from models import User
+    from models import User, session
     try:
         user = User.query.filter_by(id=user_id).first()
         if user:
-            from models import session
             session.delete(user)
             session.commit()
             return {"status": "OK"}
@@ -116,13 +114,12 @@ def user_update():
     Params
     None.
     """
-    from models import User
+    from models import User, session
     try:
         if not request.is_json:
             raise Exception
         updated = request.json
         password = updated.get("password")
-        from models import session
         if password is not None:
             pwd_hash = generate_password_hash(password)
             [updated.pop(k, None) for k in ['password', 'id']]
