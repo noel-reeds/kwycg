@@ -55,7 +55,7 @@ class User(Base, UserMixin):
             return None
         except BadSignature:
             return None
-        user = User.query.get(data.get('id'))
+        user = User.query.get(d.get('id'))
         return user
 
     def __repr__(self) -> str:
