@@ -7,7 +7,7 @@ auth = HTTPBasicAuth()
 user = Blueprint('user', __name__)
 
 @auth.verify_password
-def verify_password(username, password):
+def verify_password(username_or_token, password):
     """
     Verifies a user before accessing protected or private
     endpoints.
@@ -16,12 +16,25 @@ def verify_password(username, password):
     Username and password of user.
     """
     from models import User
-    user = User.query.filter_by(username=username).first()
-    if not user or not user.verify_passwd(password):
-        return False
+    user = User.verify_auth_token(username_or_token)
+    if not user:
+        user = User.query.filter_by(username=username_or_token).first()
+        if not user or not user.verify_passwd(password):
+            return False
     g.user = user
     return True
 
+@user.route('/token')
+@auth.login_required
+def get_token():
+    """
+    User requests authentication token.
+
+    Params:
+    None
+    """
+    token = g.user.generate_auth_token()
+    return { 'token': token }
 
 @user.route('/users', methods=['GET'])
 def users():
