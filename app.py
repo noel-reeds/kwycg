@@ -28,7 +28,6 @@ def setup() -> Flask:
     app.register_blueprint(auth_blueprint, url_prefix='/api/v1')
     app.register_blueprint(expense_blueprint, url_prefix='/api/v1')
     app.register_blueprint(users_blueprint, url_prefix='/api/v1')
-
     return app
 
 app = setup()

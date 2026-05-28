@@ -45,7 +45,6 @@ class User(Base, UserMixin):
         None.
         """
         return dict(username=self.username,
-                    passwd_hash=self.passwd_hash,
                     email=self.email,
                     id=self.id,
                     created_at=self.created_at,
