@@ -40,7 +40,7 @@ class User(Base, UserMixin):
         return auth_s.dumps({ 'id': self.id })
 
     @staticmethod
-    def verify_auth_token(token, expires_in=600):
+    def verify_auth_token(access_token, expires_in=600):
         """
         Verifies authentication token.
 
@@ -50,7 +50,7 @@ class User(Base, UserMixin):
         from models import app
         auth_s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
         try:
-            d = auth_s.loads(token, max_age=expires_in)
+            d = auth_s.loads(access_token, max_age=expires_in)
         except SignatureExpired:
             return None
         except BadSignature:

@@ -24,7 +24,7 @@ def verify_password(username_or_token, password):
     g.user = user
     return True
 
-@user.route('/token')
+@user.route('/access_token')
 @auth.login_required
 def get_token():
     """
@@ -33,8 +33,8 @@ def get_token():
     Params:
     None
     """
-    token = g.user.generate_auth_token()
-    return { 'token': token }
+    access_token = g.user.generate_auth_token()
+    return { 'token': access_token }
 
 @user.route('/users', methods=['GET'])
 def users():
