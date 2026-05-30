@@ -40,7 +40,7 @@ class User(Base, UserMixin):
         return auth_s.dumps({ 'id': self.id })
 
     @staticmethod
-    def verify_auth_token(access_token, expires_in=600):
+    def verify_auth_token(access_token, expires_in=3600):
         """
         Verifies authentication token.
 
